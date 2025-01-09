@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking2Day</title>
+    <style>
+        @keyframes backgroundAnimation {
+            0% { background-position: 0 0; }
+            100% { background-position: 100% 100%; }
+        }
+
+        @keyframes snow {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(100vh); }
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 10vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: backgroundAnimation 360s linear infinite;
+            font-family: 'Arial', sans-serif;
+            color: #fff;
+            overflow-y: auto;
+        }
+
+        header {
+            width: 100%;
+            height: 20px;
+            background: transparent;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #f0f, 0 0 20px #f0f, 0 0 30px #ff0;
+            margin-bottom: 20px;
+        }
+        div {
+    border: 3px solid transparent;
+    border-radius: 10px;
+    color: white;
+    font-size: 2em; /* Для кращої видимості ефекту */
+    animation: rgb-glow 5s linear infinite; /* Запускаємо анімацію */
+}
+
+@keyframes rgb-glow {
+    0% {
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.7); /* Червоний */
+    }
+    20% {
+        text-shadow: 0 0 10px rgba(255, 255, 0, 0.7); /* Жовтий */
+    }
+    40% {
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.7); /* Зелений */
+    }
+    60% {
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.7); /* Блакитний */
+    }
+    80% {
+        text-shadow: 0 0 10px rgba(0, 0, 255, 0.7); /* Синій */
+    }
+    100% {
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.7); /* Знову червоний */
+    }
+}
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            max-height: 50%;
+            background-color: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 30px rgba(255, 255, 0, 0.8);
+            border: 3px solid transparent;
+            border-image: linear-gradient(90deg, #ff0, #f0f);
+            border-image-slice: 1;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px;
+            text-align: center;
+            color: #fff;
+        }
+
+        th {
+            background: rgba(255, 0, 255, 0.8);
+        }
+
+        td {
+            font-size: 1.2em;
+        }
+
+        .message {
+            margin: 10px 0;
+            text-align: center;
+            font-size: 1.2em;
+            color: #fff;
+        }
+
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 10px 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 0.9em;
+        }
+
+        .snowflake {
+            position: absolute;
+            top: 0px;
+            color: white;
+            font-size: 10px;
+            opacity: 0.8;
+            animation: snow 30s linear infinite;
+        }
+
+        @media screen and (max-width: 768px) {
+            table {
+                width: 95%;
+            }
+        }
+    </style>
+    <script>
+        async function fetchPrices() {
+            const symbols = ['BTC', 'ETH', 'ADA', 'SOL', 'LINK', 'XRP', 'ATOM', 'NEAR', 'HNT', 'TWT', 'AVAX', 'DOT', 'SAMO', 'FIL', 'ICP', 'MNT'];
+            const apiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=';
+            const ids = {
+                BTC: 'bitcoin',
+                ETH: 'ethereum',
+                ADA: 'cardano',
+                SOL: 'solana',
+                LINK: 'chainlink',
+                XRP: 'ripple',
+                ATOM: 'cosmos',
+                NEAR: 'near',
+                HNT: 'helium',
+                TWT: 'trust-wallet-token',
+                AVAX: 'avalanche-2',
+                DOT: 'polkadot',
+                SAMO: 'samoyedcoin',
+                FIL: 'filecoin',
+                ICP: 'internet-computer',
+                MNT: 'mantle'
+            };
+
+            const url = apiUrl + Object.values(ids).join(',') + '&vs_currencies=usd';
+            const response = await fetch(url);
+            const data = await response.json();
+
+            symbols.forEach(symbol => {
+                const priceCell = document.getElementById(symbol);
+                priceCell.textContent = data[ids[symbol]].usd + ' USD';
+            });
+        }
+
+        function createSnowflakes() {
+            const snowflake = document.createElement('div');
+            snowflake.className = 'snowflake';
+            snowflake.textContent = '*';
+            snowflake.style.left = Math.random() * 100 + 'vw';
+            snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+            snowflake.style.animationDuration = Math.random() * 5 + 5 + 's';
+            document.body.appendChild(snowflake);
+
+            setTimeout(() => {
+                snowflake.remove();
+            }, 10000);
+        }
+
+        window.onload = () => {
+            fetchPrices();
+            setInterval(fetchPrices, 1000); // Update every second
+            setInterval(createSnowflakes, 200);
+        };
+    </script>
+</head>
+<body>
+    <header></header>
+    <h1>Tracking2Day</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Криптовалюта</th>
+                <th>Ціна (USD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- BTC and ETH -->
+            <tr>
+                <td>BTC</td>
+                <td id="BTC">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>ETH</td>
+                <td id="ETH">Завантаження...</td>
+            </tr>
+            <tr class="separator"></tr>
+
+            <!-- Altcoins in alphabetical order -->
+            <tr>
+                <td>ADA</td>
+                <td id="ADA">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>AVAX</td>
+                <td id="AVAX">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>ATOM</td>
+                <td id="ATOM">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>DOT</td>
+                <td id="DOT">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>FIL</td>
+                <td id="FIL">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>HNT</td>
+                <td id="HNT">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>ICP</td>
+                <td id="ICP">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>LINK</td>
+                <td id="LINK">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>MNT</td>
+                <td id="MNT">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>NEAR</td>
+                <td id="NEAR">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>SAMO</td>
+                <td id="SAMO">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>SOL</td>
+                <td id="SOL">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>TWT</td>
+                <td id="TWT">Завантаження...</td>
+            </tr>
+            <tr>
+                <td>XRP</td>
+                <td id="XRP">Завантаження...</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="message">Дякуємо що стежите за перспективними проектами разом з нами</div>
+    <!-- Added new table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Актив</th>
+                <th>Кількість</th>
+                <th>Поточна ціна (USD)</th>
+                <th>Ціна продажу (USD)</th>
+                <th>Загальна сума при продажу (USD)</th>
+                <th>Прибуток (USD)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ADA</td>
+                <td>1649</td>
+                <td>1.09</td>
+                <td>2.9</td>
+                <td>4782</td>
+                <td>3755</td>
+            </tr>
+            <tr>
+                <td>ATOM</td>
+                <td>132.23</td>
+                <td>6.4535</td>
+                <td>30</td>
+                <td>3966.9</td>
+                <td>3113.56</td>
+            </tr>
+            <tr>
+                <td>ETH</td>
+                <td>0.228</td>
+                <td>3421.53</td>
+                <td>7000</td>
+                <td>1596.0</td>
+                <td>821.17</td>
+            </tr>
+            <tr>
+                <td>FTM</td>
+                <td>330</td>
+                <td>0.712</td>
+                <td>2.5</td>
+                <td>825.0</td>
+                <td>590.04</td>
+            </tr>
+            <tr>
+                <td>HNT</td>
+                <td>41.99</td>
+                <td>6.1976</td>
+                <td>20</td>
+                <td>839.8</td>
+                <td>580.62</td>
+            </tr>
+            <tr>
+                <td>LINK</td>
+                <td>19.49</td>
+                <td>20.94</td>
+                <td>35</td>
+                <td>682.15</td>
+                <td>273.92</td>
+            </tr>
+            <tr>
+                <td>MNT</td>
+                <td>350.56</td>
+                <td>1.2687</td>
+                <td>3</td>
+                <td>1051.68</td>
+                <td>567.45</td>
+            </tr>
+            <tr>
+                <td>NEAR</td>
+                <td>153.04</td>
+                <td>5.1217</td>
+                <td>15</td>
+                <td>2295.6</td>
+                <td>1506.31</td>
+            </tr>
+            <tr>
+                <td>SOL</td>
+                <td>3.6461</td>
+                <td>197.33</td>
+                <td>400</td>
+                <td>1458.44</td>
+                <td>738.94</td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align: center; font-weight: bold;">Загальна сума</td>
+                <td style="font-weight: bold;">17612.82</td>
+                <td style="font-weight: bold;">11386.0</td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="message">Фіксування альткоїнів</div>
+    <img src="image.png" alt="Графік" style="display: block; margin: 20px auto; max-width: 50%;">
+    <div class="message">Кінець бичачого сезону</div>
+    <img src="image2.png" alt="Графік" style="display: block; margin: 20px auto; max-width: 50%;">
+    <div class="message">Фіксування Cardano</div>
+    <img src="image3.png" alt="Графік" style="display: block; margin: 20px auto; max-width: 50%;">
+    <div class="message">Домінація BTC</div>
+    <img src="image4.png" alt="Графік" style="display: block; margin: 20px auto; max-width: 50%;">
+    <footer>
+        © 2024 Coin2Day. Усі права захищені.
+    </footer>
+</body>
+</html>
